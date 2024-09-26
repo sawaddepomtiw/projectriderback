@@ -8,13 +8,10 @@ export const router = express.Router();
 
 
 router.get("/", (req, res) => {
-    let sql = "SELECT * FROM rider";
-
-    conn.query(sql, (err, result) => {
-        if(err) throw err;
-        res.status(200).json({response:true, result})
-    })
-})
+    conn.query('select * from rider', (err, result, fields)=>{
+      res.json(result);
+    });
+  });
 
 //get id
 router.get("/:id", (req, res) => {
