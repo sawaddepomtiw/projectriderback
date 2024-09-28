@@ -1,7 +1,7 @@
 export interface GetMember {
     mid:          number;
     name:         string;
-    phone:        number;
+    phone:        string;
     password:     string;
     address:      string;
     gps:          string;

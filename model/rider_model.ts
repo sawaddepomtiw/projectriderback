@@ -6,7 +6,7 @@
 export interface Getrider {
     rid:         number;
     name:        string;
-    phone:       number;
+    phone:       string;
     password:    string;
     plate:       string;
     image_rider: string;
