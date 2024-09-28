@@ -15,7 +15,7 @@ router.get("/", (req, res) => {
 //get id
 router.get("/:id", (req, res) => {
   let id = +req.params.id;
-  conn.query("select * from member where mid = ?" , [id], (err, result, fields) => {
+  conn.query("select * from member where phone = ?" , [id], (err, result, fields) => {
   if (err) throw err;
     res.json(result);
   });
