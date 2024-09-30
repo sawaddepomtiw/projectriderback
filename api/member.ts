@@ -44,7 +44,7 @@ router.post("/register", (req, res) => {
           res.status(500).send("Error inserting data");
           return;
       }
-      res.send("rider registered successfully");
+      res.send("member registered successfully");
   });
 });
 
