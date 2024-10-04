@@ -1,4 +1,6 @@
 import mysql from "mysql";
+import util from "util";
+
 
 export const conn = mysql.createPool({
     connectionLimit: 10,
@@ -7,3 +9,5 @@ export const conn = mysql.createPool({
     password: "65011212172@csmsu",
     database: "web66_65011212172",
   });
+
+  export const queryAsync = util.promisify(conn.query).bind(conn);
