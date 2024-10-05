@@ -16,6 +16,44 @@ export const router = express.Router();
     });
 });
 
+router.get("/all", (req, res) => {
+    const sql = `
+        SELECT 
+            orderdelivery.*, 
+            sender.name AS sender_name, 
+            sender.phone AS sender_phone, 
+            sender.address AS sender_address, 
+            sender.gps AS sender_gps, 
+            sender.image_member AS sender_image_member,
+            receiver.name AS receiver_name, 
+            receiver.phone AS receiver_phone, 
+            receiver.address AS receiver_address, 
+            receiver.gps AS receiver_gps, 
+            receiver.image_member AS receiver_image_member,
+            rider.name AS rider_name,
+            rider.phone AS rider_phone,
+            rider.plate AS rider_plate,
+            rider.image_rider AS rider_image
+        FROM orderdelivery
+        JOIN member AS sender ON orderdelivery.mid_sender = sender.mid
+        JOIN member AS receiver ON orderdelivery.mid_receiver = receiver.mid
+        JOIN rider ON orderdelivery.rid = rider.rid -- เชื่อมกับ table rider
+    `;
+    
+    conn.query(sql, (err, result, fields) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Database query failed' });
+            return;
+        }
+        res.json(result);
+    });
+});
+
+
+
+
+
 router.post("/insertorder", (req, res) => {
     let order: Getorder = req.body;
   
