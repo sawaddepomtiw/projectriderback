@@ -20,6 +20,14 @@ router.get("/:id", (req, res) => {
     res.json(result);
   });
 });
+//search member
+router.get("/search/:phone", (req, res) => {
+  let phone = +req.params.phone;
+  conn.query("SELECT * FROM member WHERE phone LIKE ?" , ['%' + phone + '%'], (err, result, fields) => {
+  if (err) throw err;
+    res.json(result);
+  });
+});
 
 //register
 router.post("/register", (req, res) => {
