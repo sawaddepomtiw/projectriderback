@@ -16,7 +16,12 @@ export const router = express.Router();
     });
 });
 
-router.get("/all", (req, res) => {
+
+router.get("/all/:id", (req, res) => {
+    // Capture the id from the request parameters and convert to a number
+    let id =+ req.params.id;
+
+    // Create the SQL query with a WHERE clause to filter by id
     const sql = `
         SELECT 
             orderdelivery.*, 
@@ -37,16 +42,23 @@ router.get("/all", (req, res) => {
         FROM orderdelivery
         JOIN member AS sender ON orderdelivery.mid_sender = sender.mid
         JOIN member AS receiver ON orderdelivery.mid_receiver = receiver.mid
-        JOIN rider ON orderdelivery.rid = rider.rid -- เชื่อมกับ table rider
+        JOIN rider ON orderdelivery.rid = rider.rid
+        WHERE orderdelivery.oid = ? -- Filtering by id
     `;
-    
-    conn.query(sql, (err, result, fields) => {
+
+    // Execute the query with the id parameter
+    conn.query(sql, [id], (err, result, fields) => {
         if (err) {
             console.error('Error executing query:', err);
             res.status(500).json({ error: 'Database query failed' });
             return;
         }
-        res.json(result);
+        // If no results, return a 404 status
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'No delivery found with this ID' });
+        }
+        // Return the first result object instead of an array
+        res.json(result[0]);
     });
 });
 
