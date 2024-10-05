@@ -88,6 +88,16 @@ router.put("/updatemember/:phone", async (req, res) => {
   });
 });
 
+router.delete("/:id", (req, res) => {
+  let id = +req.params.id;
+  conn.query("delete from member where mid = ?", [id], (err, result) => {
+     if (err) throw err;
+     res
+       .status(200)
+       .json({ affected_row: result.affectedRows });
+  });
+});
+
 
 
   

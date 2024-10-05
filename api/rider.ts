@@ -75,3 +75,13 @@ router.put("/updaterider/:phone", async (req, res) => {
       res.send("rider update successfully");
   });
 });
+
+router.delete("/:id", (req, res) => {
+  let id = +req.params.id;
+  conn.query("delete from rider where rid = ?", [id], (err, result) => {
+     if (err) throw err;
+     res
+       .status(200)
+       .json({ affected_row: result.affectedRows });
+  });
+});
