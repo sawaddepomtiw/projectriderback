@@ -89,7 +89,7 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/insert", (req, res) => {
-    let order = req.body;
+    let order: Getdelivery = req.body;
 
     // SQL insert query
     let sql = `
@@ -106,7 +106,7 @@ router.post("/insert", (req, res) => {
         order.status        // Status
     ]);
 
-    // Execute the SQL query
+    
     conn.query(sql, (err) => {
         if (err) {
             // Send error response if there is an issue
@@ -119,7 +119,7 @@ router.post("/insert", (req, res) => {
 });
 
 router.put("/update/:did", async (req, res) => {
-    let order = req.body; // รับข้อมูลอัปเดตจาก request body
+    let order: Getdelivery = req.body;
     let did = parseInt(req.params.did); // แปลง `did` จาก params
 
     // ดึงข้อมูลเดิมจากตาราง `delivery` ตาม `did`
@@ -132,7 +132,7 @@ router.put("/update/:did", async (req, res) => {
         let orderdata = rawData[0]; // ข้อมูลเดิมของการส่ง
 
         // ผสมข้อมูลใหม่กับข้อมูลเดิม
-        let updatedOrder = { ...orderdata, ...order };
+        let updatedOrder = { ...orderdata, ...order } as Getdelivery;
 
         // สร้างคำสั่ง SQL สำหรับอัปเดตข้อมูล
         sql = `
