@@ -16,6 +16,42 @@ router.get("/", (req, res) => {
     });
 });
 
+router.get("/all", (req, res) => {
+    const sql = `
+        SELECT 
+            delivery.*, 
+            sender.name AS sender_name, 
+            sender.phone AS sender_phone, 
+            sender.address AS sender_address, 
+            sender.gps AS sender_gps, 
+            sender.image_member AS sender_image_member,
+            receiver.name AS receiver_name, 
+            receiver.phone AS receiver_phone, 
+            receiver.address AS receiver_address, 
+            receiver.gps AS receiver_gps, 
+            receiver.image_member AS receiver_image_member
+        FROM delivery
+        JOIN member AS sender ON delivery.sender_id = sender.mid
+        JOIN member AS receiver ON delivery.receiver_id = receiver.mid
+    `;
+    
+    // Execute the query without any filter
+    conn.query(sql, (err, result, fields) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Database query failed' });
+            return;
+        }
+        // If no results, return a 404 status
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'No deliveries found' });
+        }
+        // Return the full result array
+        res.json(result);
+    });
+});
+
+
 router.get("/:id", (req, res) => {
     let id = parseInt(req.params.id); // แปลงเป็นตัวเลข
     const sql = `
