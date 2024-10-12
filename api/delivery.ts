@@ -6,7 +6,7 @@ import mysql from "mysql";
 export const router = express.Router();
 
 router.get("/", (req, res) => {
-    conn.query('SELECT * FROM `delivery`', (err, result, fields) => {
+    conn.query('SELECT * FROM `delivery`', (err, result) => {
         if (err) {
             console.error('Error executing query:', err);
             res.status(500).json({ error: 'Database query failed' });
@@ -73,7 +73,7 @@ router.get("/:id", (req, res) => {
         WHERE delivery.did = ? -- Filtering by id
     `;
     // Execute the query with the id parameter
-    conn.query(sql, [id], (err, result, fields) => {
+    conn.query(sql, [id], (err, result) => {
         if (err) {
             console.error('Error executing query:', err);
             res.status(500).json({ error: 'Database query failed' });
@@ -87,6 +87,78 @@ router.get("/:id", (req, res) => {
         res.json(result[0]);
     });
 });
+
+router.get("/sender/:sender_id", (req, res) => {
+    let senderid = parseInt(req.params.sender_id); // Get sender_id from URL parameters
+
+    const sql = `
+        SELECT 
+            delivery.*, 
+            sender.name AS sender_name, 
+            sender.phone AS sender_phone, 
+            sender.address AS sender_address, 
+            sender.gps AS sender_gps, 
+            sender.image_member AS sender_image_member,
+            receiver.name AS receiver_name, 
+            receiver.phone AS receiver_phone, 
+            receiver.address AS receiver_address, 
+            receiver.gps AS receiver_gps, 
+            receiver.image_member AS receiver_image_member
+        FROM delivery
+        JOIN member AS sender ON delivery.sender_id = sender.mid
+        JOIN member AS receiver ON delivery.receiver_id = receiver.mid
+        WHERE sender_id = ? -- Filtering by sender id only
+    `;
+    
+    conn.query(sql, [senderid], (err, result) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Database query failed' });
+            return;
+        }
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'No delivery found for this sender ID' });
+        }
+        res.json(result);
+    });
+});
+
+router.get("/receiver/:receiver_id", (req, res) => {
+    let receiverid = parseInt(req.params.receiver_id); // Get sender_id from URL parameters
+
+    const sql = `
+        SELECT 
+            delivery.*, 
+            sender.name AS sender_name, 
+            sender.phone AS sender_phone, 
+            sender.address AS sender_address, 
+            sender.gps AS sender_gps, 
+            sender.image_member AS sender_image_member,
+            receiver.name AS receiver_name, 
+            receiver.phone AS receiver_phone, 
+            receiver.address AS receiver_address, 
+            receiver.gps AS receiver_gps, 
+            receiver.image_member AS receiver_image_member
+        FROM delivery
+        JOIN member AS sender ON delivery.sender_id = sender.mid
+        JOIN member AS receiver ON delivery.receiver_id = receiver.mid
+        WHERE receiver_id = ? -- Filtering by sender id only
+    `;
+    
+    conn.query(sql, [receiverid], (err, result) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Database query failed' });
+            return;
+        }
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'No delivery found for this sender ID' });
+        }
+        res.json(result);
+    });
+});
+
+
 
 router.post("/insert", (req, res) => {
     let order: Getdelivery = req.body;
