@@ -117,7 +117,7 @@ router.get("/sender/:sender_id", (req, res) => {
             return;
         }
         if (result.length === 0) {
-            return res.status(404).json({ message: 'Not Found' });
+            return res.json({ message: 'Not Found' });
         }
         res.json(result);
     });
@@ -153,7 +153,7 @@ router.get("/receiver/:receiver_id", (req, res) => {
             return;
         }
         if (result.length === 0) {
-            return res.status(404).json({ message: 'Not Found' });
+            return res.json({ message: 'Not Found' });
         }
         res.json(result);
     });
