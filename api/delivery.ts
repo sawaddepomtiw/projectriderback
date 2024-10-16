@@ -117,11 +117,12 @@ router.get("/sender/:sender_id", (req, res) => {
             return;
         }
         if (result.length === 0) {
-            return res.status(404).json({ error: 'No delivery found for this sender ID' });
+            return res.status(404).json({ message: 'Not Found' });
         }
         res.json(result);
     });
 });
+
 
 router.get("/receiver/:receiver_id", (req, res) => {
     let receiverid = parseInt(req.params.receiver_id); // Get sender_id from URL parameters
@@ -152,7 +153,7 @@ router.get("/receiver/:receiver_id", (req, res) => {
             return;
         }
         if (result.length === 0) {
-            return res.status(404).json({ error: 'No delivery found for this sender ID' });
+            return res.status(404).json({ message: 'Not Found' });
         }
         res.json(result);
     });
