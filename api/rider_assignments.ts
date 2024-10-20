@@ -46,49 +46,61 @@ router.post("/insert", (req, res) => {
     });
 });
 
-router.put("/update/:raid", async (req, res) => {
+router.put("/update/:did", async (req, res) => {
     let order: GetRiderAssignments = req.body;
-    let raid = parseInt(req.params.raid); // แปลง `did` จาก params
-
-    // ดึงข้อมูลเดิมจากตาราง `delivery` ตาม `did`
-    let sql = mysql.format("SELECT * FROM rider_assignments WHERE raid = ?", [raid]);
+    let did = parseInt(req.params.did); // แปลง `did` จาก params
 
     try {
-        // ใช้ queryAsync เพื่อดึงข้อมูล
-        let result = await queryAsync(sql);
-        const rawData = JSON.parse(JSON.stringify(result));
-        let orderdata = rawData[0]; // ข้อมูลเดิมของการส่ง
+        // ดึงค่า `raid` จาก `delivery_id`
+        let raidSql = mysql.format("SELECT * FROM rider_assignments WHERE delivery_id = ? AND status = 'ไรเดอร์เข้ารับสินค้าแล้ว'", [did]);
+        let raidResult = await queryAsync(raidSql);
+        const raidData = JSON.parse(JSON.stringify(raidResult));
+        
+        if (raidData.length > 1) {
+            res.json("nono can't");
+        }else{
 
-        // ผสมข้อมูลใหม่กับข้อมูลเดิม
-        let updatedOrder = { ...orderdata, ...order } as GetRiderAssignments;
+            let raid = raidData[0].raid; // ดึงค่า `raid` จากข้อมูลที่ดึงมา
+    
+            // ดึงข้อมูลทั้งหมดจาก `rider_assignments` ที่ตรงกับ `raid`
+            let sql = mysql.format("SELECT * FROM rider_assignments WHERE raid = ?", [raid]);
+            let result = await queryAsync(sql);
+            const rawData = JSON.parse(JSON.stringify(result));
+            let orderdata = rawData[0]; // ข้อมูลเดิมของการส่ง
+    
+            // ผสมข้อมูลใหม่กับข้อมูลเดิม
+            let updatedOrder = { ...orderdata, ...order } as GetRiderAssignments;
+    
+            // สร้างคำสั่ง SQL สำหรับอัปเดตข้อมูล
+            sql = `
+                UPDATE rider_assignments
+                SET delivery_id = ?, rider_id = ?, status = ?, image_receiver = ?, image_success = ?
+                WHERE raid = ?
+            `;
+    
+            // Format คำสั่ง SQL ด้วยข้อมูลใหม่และ raid
+            sql = mysql.format(sql, [
+                updatedOrder.delivery_id,
+                updatedOrder.rider_id,
+                updatedOrder.status,
+                updatedOrder.image_receiver,
+                updatedOrder.image_success,
+                raid // ใช้ `raid` ที่ดึงมาจากก่อนหน้า
+            ]);
+    
+            // Execute SQL query สำหรับการอัปเดตข้อมูล
+            conn.query(sql, (err) => {
+                if (err) {
+                    res.status(500).send("Error updating data");
+                    return;
+                }
+                res.send("Assignments updated successfully");
+            });
+        }
 
-        // สร้างคำสั่ง SQL สำหรับอัปเดตข้อมูล
-        sql = `
-            UPDATE rider_assignments
-            SET delivery_id = ?, rider_id = ?, status = ?, image_receiver = ?, image_success = ?
-            WHERE raid = ?
-        `;
-
-        // Format คำสั่ง SQL ด้วยข้อมูลใหม่
-        sql = mysql.format(sql, [
-            updatedOrder.delivery_id,
-            updatedOrder.rider_id,
-            updatedOrder.status,
-            updatedOrder.image_receiver,
-            updatedOrder.image_success,
-            raid
-        ]);
-
-        // Execute SQL query
-        conn.query(sql, (err) => {
-            if (err) {
-                res.status(500).send("Error updating data");
-                return;
-            }
-            res.send("Assignments updated successfully");
-        });
     } catch (err) {
-        console.error("Error fetching data:", err);
-        res.status(500).send("Error fetching data");
+        console.error("Error fetching or updating data:", err);
+        res.json("Error fetching or updating data");
+        
     }
 });
