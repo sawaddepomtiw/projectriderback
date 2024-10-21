@@ -175,12 +175,13 @@ router.get("/check-order/:did", (req, res) => {
             return;
         }
 
-        if (result.length > 0) {
-            // มีออเดอร์ที่ยังไม่เสร็จสิ้น
-            res.status(200).json({ message: 'orders is can delivery' });
+        // Check if any orders are returned
+        if (result.length === 0) {
+            // No pending orders
+            res.status(404).json({ message: 'No pending orders found' });
         } else {
-            // ไม่มีออเดอร์ที่ยังค้างอยู่
-            res.status(400).json({ message: 'The order was already received by another rider.' });
+            // There are pending orders
+            res.status(200).json({ message: 'Orders can be delivered', orders: result });
         }
     });
 });
