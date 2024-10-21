@@ -179,10 +179,9 @@ router.get("/check-order/:did", (req, res) => {
         if (result.length === 0) {
             // No pending orders
             res.status(404).json({ message: 'No pending orders found' });
-        } else {
-            // There are pending orders
-            res.status(200).json({ message: 'Orders can be delivered', orders: result });
-        }
+            return;
+        } 
+        res.json("found order");
     });
 });
 
