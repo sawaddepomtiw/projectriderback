@@ -166,8 +166,8 @@ router.post("/insert", (req, res) => {
 
     // SQL insert query
     let sql = `
-        INSERT INTO delivery(sender_id, receiver_id, item_name, image, status)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO delivery(sender_id, receiver_id, item_name, image, status, rider_receive, rider_success)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     // Format the SQL query with the values from the request body
@@ -176,7 +176,9 @@ router.post("/insert", (req, res) => {
         order.receiver_id,  // Receiver ID
         order.item_name,    // Item Name
         order.image,        // Image URL
-        order.status        // Status
+        order.status,        // Status
+        order.rider_receive='-',       
+        order.rider_success='-',      
     ]);
 
     
@@ -210,7 +212,7 @@ router.put("/update/:did", async (req, res) => {
         // สร้างคำสั่ง SQL สำหรับอัปเดตข้อมูล
         sql = `
             UPDATE delivery
-            SET sender_id = ?, receiver_id = ?, item_name = ?, image = ?, status = ?
+            SET sender_id = ?, receiver_id = ?, item_name = ?, image = ?, status = ?, rider_receive = ?, rider_success = ?
             WHERE did = ?
         `;
 
@@ -221,6 +223,8 @@ router.put("/update/:did", async (req, res) => {
             updatedOrder.item_name,
             updatedOrder.image,
             updatedOrder.status,
+            updatedOrder.rider_receive, 
+            updatedOrder.rider_success ,  
             did
         ]);
 

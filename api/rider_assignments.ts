@@ -58,6 +58,7 @@ router.put("/update/:did", async (req, res) => {
         
         if (raidData.length > 1) {
             res.json("nono can't");
+            return;
         }else{
 
             let raid = raidData[0].raid; // ดึงค่า `raid` จากข้อมูลที่ดึงมา
