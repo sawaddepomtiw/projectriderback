@@ -16,6 +16,7 @@ router.get("/", (req, res) => {
     });
 });
 
+
 router.post("/insert", (req, res) => {
     let order: GetRiderAssignments = req.body;
 

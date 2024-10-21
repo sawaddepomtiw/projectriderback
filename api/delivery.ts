@@ -160,6 +160,31 @@ router.get("/receiver/:receiver_id", (req, res) => {
 });
 
 
+router.get("/check-order/:did", (req, res) => {
+    const did = req.params.did;
+
+    const query = `
+        SELECT * FROM delivery
+        WHERE did = ? AND status IN ('รอไรเดอร์เข้ารับสินค้า')
+    `;
+
+    conn.query(query, [did], (err, result) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Database query failed' });
+            return;
+        }
+
+        if (result.length > 0) {
+            // มีออเดอร์ที่ยังไม่เสร็จสิ้น
+            res.status(200).json({ message: 'orders is can delivery' });
+        } else {
+            // ไม่มีออเดอร์ที่ยังค้างอยู่
+            res.status(400).json({ message: 'The order was already received by another rider.' });
+        }
+    });
+});
+
 
 router.post("/insert", (req, res) => {
     let order: Getdelivery = req.body;
